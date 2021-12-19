@@ -1,0 +1,10 @@
+/.idea
+/.vscode
+/.vs
+/.atom
+
+build
+a.out
+ddos
+
+testserver.go
