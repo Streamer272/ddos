@@ -12,6 +12,7 @@ func Parse() Options {
 
 	delay := parser.Int("d", "delay", &argparse.Options{Required: false, Help: "Packet Delay", Default: 0})
 	maxRetryCount := parser.Int("r", "max-retry-count", &argparse.Options{Required: false, Help: "Max retry count, 0 for none", Default: 0})
+	workerCount := parser.Int("w", "worker-count", &argparse.Options{Required: false, Help: "Worker thread count, 0 for none", Default: 0})
 	address := parser.String("a", "address", &argparse.Options{Required: true, Help: "Address to DDOS"})
 	message := parser.String("m", "message", &argparse.Options{Required: false, Help: "Message to send", Default: ""})
 	logLevel := parser.Selector("l", "log-level", []string{"NONE", "ERROR", "WARN", "INFO"}, &argparse.Options{Required: false, Help: "Log level", Default: "INFO"})
@@ -36,6 +37,7 @@ func Parse() Options {
 	return Options{
 		Delay:         *delay,
 		MaxRetryCount: *maxRetryCount,
+		WorkerCount:   *workerCount,
 		Address:       *address,
 		Message:       *message,
 		LogLevel:      *logLevel,
