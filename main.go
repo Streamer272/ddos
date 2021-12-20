@@ -22,6 +22,8 @@ func ddos(opt options.Options) error {
 		return err
 	}
 
+	defer conn.Close()
+
 	message := ""
 	if opt.Message != "" {
 		message = opt.Message
@@ -33,11 +35,6 @@ func ddos(opt options.Options) error {
 		}
 	}
 	_, err = fmt.Fprintf(conn, "%v\n", message)
-	if err != nil {
-		return err
-	}
-
-	err = conn.Close()
 	if err != nil {
 		return err
 	}
@@ -85,17 +82,15 @@ func main() {
 				}
 			}()
 
+			if opt.WorkerCount > 0 {
+				currentWorkerCount++
+				if currentWorkerCount >= opt.WorkerCount {
+					log.Log("INFO", "Worker count reached (%v), exiting...", opt.WorkerCount)
+					os.Exit(0)
+				}
+			}
+
 			time.Sleep(time.Millisecond * time.Duration(opt.Delay))
-
-			if opt.WorkerCount <= 0 {
-				continue
-			}
-
-			currentWorkerCount++
-			if currentWorkerCount >= opt.WorkerCount {
-				log.Log("INFO", "Worker count reached (%v), exiting...", opt.WorkerCount)
-				os.Exit(0)
-			}
 		}
 	}()
 
