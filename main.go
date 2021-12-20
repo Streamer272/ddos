@@ -1,9 +1,9 @@
 package main
 
 import (
+	"ddos/logger"
 	"ddos/options"
 	"fmt"
-	"log"
 	"net"
 	"os"
 	"time"
@@ -44,49 +44,40 @@ func ddos(opt options.Options) error {
 }
 
 func main() {
-	log.SetFlags(3)
-
 	opt := options.Parse()
+	log := logger.NewLogger(opt.LogLevel)
 	currentRetryCount := 0
 
 	err := ddos(opt)
 	if err != nil {
-		if opt.LogLevelToInt() <= 2 {
-			log.Printf("Couldn't run test-connect, error: %v...\n", err)
-		}
+		log.Log("ERROR", "Couldn't run test-connect, error: %v...\n", err)
+
 		if !opt.IgnoreError {
 			os.Exit(1)
 		}
 	}
 
-	if opt.LogLevelToInt() <= 0 {
-		log.Printf("Starting DDOS...")
-	}
+	log.Log("INFO", "Starting DDOS...")
 
 	for {
 		go func() {
 			err := ddos(opt)
 			if err != nil {
-				if opt.LogLevelToInt() <= 1 {
-					log.Printf("%v\n", err)
-				}
+				log.Log("WARN", "%v\n", err)
 
 				if opt.MaxRetryCount <= 0 {
 					return
 				}
 
 				if currentRetryCount += 1; currentRetryCount > opt.MaxRetryCount {
-					if opt.LogLevelToInt() <= 2 {
-						log.Printf("Reached max retry count (%v), exiting...\n", opt.MaxRetryCount)
-					}
+					log.Log("ERROR", "Reached max retry count (%v), exiting...\n", opt.MaxRetryCount)
+
 					if !opt.IgnoreError {
 						os.Exit(1)
 					}
 				}
 			} else {
-				if opt.LogLevelToInt() <= 0 {
-					log.Printf("Successfully send packet to %v...\n", opt.Address)
-				}
+				log.Log("INFO", "Successfully send packet to %v...\n", opt.Address)
 			}
 		}()
 
