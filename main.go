@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	HttpMessage   = "GET / HTTP/1.0\n"
+	HttpMessage   = "GET / HTTP/1.1\n"
 	SocketMessage = "abcdefghijklmnopqrstuvwxyz1234567890"
 )
 
