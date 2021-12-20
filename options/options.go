@@ -8,4 +8,5 @@ type Options struct {
 	LogLevel      string
 	Http          bool
 	IgnoreError   bool
+	NoColor       bool
 }

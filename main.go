@@ -45,7 +45,7 @@ func ddos(opt options.Options) error {
 
 func main() {
 	opt := options.Parse()
-	log := logger.NewLogger(opt.LogLevel)
+	log := logger.NewLogger(opt.LogLevel, opt.NoColor)
 	currentRetryCount := 0
 
 	err := ddos(opt)

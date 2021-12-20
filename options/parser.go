@@ -17,6 +17,7 @@ func Parse() Options {
 	logLevel := parser.Selector("l", "log-level", []string{"NONE", "ERROR", "WARN", "INFO"}, &argparse.Options{Required: false, Help: "Log level", Default: "INFO"})
 	http := parser.Flag("H", "http", &argparse.Options{Required: false, Help: "Whether to use HTTP", Default: false})
 	ignoreError := parser.Flag("i", "ignore-error", &argparse.Options{Required: false, Help: "Whether to ignore error", Default: false})
+	noColor := parser.Flag("N", "no-color", &argparse.Options{Required: false, Help: "Whether to display colored output", Default: false})
 
 	err := parser.Parse(os.Args)
 	if err != nil {
@@ -40,5 +41,6 @@ func Parse() Options {
 		LogLevel:      *logLevel,
 		IgnoreError:   *ignoreError,
 		Http:          *http,
+		NoColor:       *noColor,
 	}
 }

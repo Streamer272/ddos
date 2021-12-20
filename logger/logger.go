@@ -19,7 +19,9 @@ func (l Logger) Log(logLevel string, message string, formats ...interface{}) {
 	fmt.Printf("[%v] %v: %v\n", getColorByLogLevel(logLevelToInt(logLevel))(logLevel), currentTime.Format("15:04:05"), fmt.Sprintf(message, formats...))
 }
 
-func NewLogger(desiredLogLevel string) Logger {
+func NewLogger(desiredLogLevel string, noColor bool) Logger {
+	color.NoColor = noColor
+
 	return Logger{
 		DesiredLogLevel: desiredLogLevel,
 	}
