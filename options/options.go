@@ -5,4 +5,5 @@ type Options struct {
 	Delay         int
 	Http          bool
 	MaxRetryCount int
+	Message       string
 }

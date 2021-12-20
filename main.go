@@ -21,10 +21,14 @@ func ddos(opt options.Options) error {
 	}
 
 	message := ""
-	if opt.Http {
-		message = HttpMessage
+	if opt.Message != "" {
+		message = opt.Message
 	} else {
-		message = SocketMessage
+		if opt.Http {
+			message = HttpMessage
+		} else {
+			message = SocketMessage
+		}
 	}
 	_, err = fmt.Fprint(conn, message)
 	if err != nil {
@@ -46,7 +50,7 @@ func main() {
 	currentRetryCount := 0
 
 	if err := ddos(opt); err != nil {
-		fmt.Printf("Couldn't run test-connect, error: %v...\n", err)
+		log.Printf("Couldn't run test-connect, error: %v...\n", err)
 		os.Exit(1)
 	}
 
@@ -56,16 +60,18 @@ func main() {
 		go func() {
 			err := ddos(opt)
 			if err != nil {
-				fmt.Printf("%v\n", err)
+				log.Printf("%v\n", err)
 
 				if opt.MaxRetryCount <= 0 {
 					return
 				}
 
 				if currentRetryCount += 1; currentRetryCount > opt.MaxRetryCount {
-					fmt.Printf("Reached max retry count (%v), exiting...\n", opt.MaxRetryCount)
+					log.Printf("Reached max retry count (%v), exiting...\n", opt.MaxRetryCount)
 					os.Exit(1)
 				}
+			} else {
+				log.Printf("Successfully send packet to %v...\n", opt.Address)
 			}
 		}()
 

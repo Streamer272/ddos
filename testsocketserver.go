@@ -1,18 +1,36 @@
 package main
 
-import "net"
+import (
+	"io/ioutil"
+	"net"
+)
 import "fmt"
-import "bufio"
 
 func main() {
 	fmt.Println("Start server...")
 
-	ln, _ := net.Listen("tcp", ":8080")
-
-	conn, _ := ln.Accept()
+	ln, err := net.Listen("tcp", ":8080")
+	if err != nil {
+		panic(err)
+	}
 
 	for {
-		message, _ := bufio.NewReader(conn).ReadString('\n')
-		fmt.Printf("Message Received: %v\n", string(message))
+		conn, err := ln.Accept()
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Printf("GOT CONN %v \n", conn)
+
+		go func() {
+			for {
+				message, err := ioutil.ReadAll(conn)
+				if err != nil {
+					continue
+				}
+
+				fmt.Printf("Message Received: %v\n", string(message))
+			}
+		}()
 	}
 }
