@@ -1,7 +1,8 @@
 package main
 
 import (
-	"io/ioutil"
+	"bufio"
+	"log"
 	"net"
 )
 import "fmt"
@@ -20,16 +21,16 @@ func main() {
 			panic(err)
 		}
 
-		fmt.Printf("GOT CONN %v \n", conn)
+		log.Printf("GOT CONN %v \n", conn)
 
 		go func() {
 			for {
-				message, err := ioutil.ReadAll(conn)
+				message, err := bufio.NewReader(conn).ReadString('\n')
 				if err != nil {
-					continue
+					log.Printf("Couldn't read message, %v...\n", err)
 				}
 
-				fmt.Printf("Message Received: %v\n", string(message))
+				log.Printf("Message Received: %v\n", string(message))
 			}
 		}()
 	}

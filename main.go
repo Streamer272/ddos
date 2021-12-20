@@ -30,7 +30,7 @@ func ddos(opt options.Options) error {
 			message = SocketMessage
 		}
 	}
-	_, err = fmt.Fprint(conn, message)
+	_, err = fmt.Fprintf(conn, "%v\n", message)
 	if err != nil {
 		return err
 	}
