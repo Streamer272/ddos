@@ -12,6 +12,7 @@ func Parse() Options {
 	address := parser.String("a", "address", &argparse.Options{Required: true, Help: "Address to DDOS"})
 	delay := parser.Int("d", "delay", &argparse.Options{Required: false, Help: "Packet Delay", Default: 0})
 	http := parser.Flag("H", "http", &argparse.Options{Required: false, Help: "Whether to use HTTP", Default: false})
+	maxRetryCount := parser.Int("m", "max-retry-count", &argparse.Options{Required: false, Help: "Max retry count, 0 for none", Default: 0})
 
 	err := parser.Parse(os.Args)
 	if err != nil {
@@ -20,8 +21,9 @@ func Parse() Options {
 	}
 
 	return Options{
-		Address: *address,
-		Delay:   *delay,
-		Http:    *http,
+		Address:       *address,
+		Delay:         *delay,
+		Http:          *http,
+		MaxRetryCount: *maxRetryCount,
 	}
 }

