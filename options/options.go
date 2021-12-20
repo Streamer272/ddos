@@ -1,10 +1,11 @@
 package options
 
 type Options struct {
-	Address       string
 	Delay         int
-	Http          bool
 	MaxRetryCount int
+	Address       string
 	Message       string
+	LogLevel      string
+	Http          bool
 	IgnoreError   bool
 }
