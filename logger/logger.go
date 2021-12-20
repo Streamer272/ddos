@@ -14,7 +14,8 @@ func (l Logger) Log(logLevel string, message string, formats ...interface{}) {
 		return
 	}
 
-	fmt.Printf("[%v] %v: %v\n", logLevel, time.Now(), fmt.Sprintf(message, formats))
+	currentTime := time.Now()
+	fmt.Printf("[%v] %v: %v\n", logLevel, currentTime.Format("15:04:05"), fmt.Sprintf(message, formats...))
 }
 
 func NewLogger(desiredLogLevel string) Logger {
