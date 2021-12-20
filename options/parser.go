@@ -7,10 +7,12 @@ import (
 )
 
 func Parse() Options {
-	parser := argparse.NewParser("print", "Prints provided string to stdout")
+	parser := argparse.NewParser("print", "Runs DDOS attack on desired server")
+
 	address := parser.String("a", "address", &argparse.Options{Required: true, Help: "Address to DDOS"})
 	delay := parser.Int("d", "delay", &argparse.Options{Required: false, Help: "Packet Delay", Default: 0})
-	http := parser.Flag("p", "http", &argparse.Options{Required: false, Help: "Whether to use HTTP", Default: false})
+	http := parser.Flag("H", "http", &argparse.Options{Required: false, Help: "Whether to use HTTP", Default: false})
+
 	err := parser.Parse(os.Args)
 	if err != nil {
 		fmt.Print(parser.Usage(err))
