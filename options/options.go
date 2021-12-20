@@ -6,4 +6,5 @@ type Options struct {
 	Http          bool
 	MaxRetryCount int
 	Message       string
+	IgnoreError   bool
 }

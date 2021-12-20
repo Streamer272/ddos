@@ -49,9 +49,12 @@ func main() {
 	opt := options.Parse()
 	currentRetryCount := 0
 
-	if err := ddos(opt); err != nil {
+	err := ddos(opt)
+	if err != nil {
 		log.Printf("Couldn't run test-connect, error: %v...\n", err)
-		os.Exit(1)
+		if !opt.IgnoreError {
+			os.Exit(1)
+		}
 	}
 
 	log.Printf("Starting DDOS...")
@@ -68,7 +71,9 @@ func main() {
 
 				if currentRetryCount += 1; currentRetryCount > opt.MaxRetryCount {
 					log.Printf("Reached max retry count (%v), exiting...\n", opt.MaxRetryCount)
-					os.Exit(1)
+					if !opt.IgnoreError {
+						os.Exit(1)
+					}
 				}
 			} else {
 				log.Printf("Successfully send packet to %v...\n", opt.Address)
