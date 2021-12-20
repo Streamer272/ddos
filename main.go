@@ -51,32 +51,42 @@ func main() {
 
 	err := ddos(opt)
 	if err != nil {
-		log.Printf("Couldn't run test-connect, error: %v...\n", err)
+		if opt.LogLevelToInt() <= 2 {
+			log.Printf("Couldn't run test-connect, error: %v...\n", err)
+		}
 		if !opt.IgnoreError {
 			os.Exit(1)
 		}
 	}
 
-	log.Printf("Starting DDOS...")
+	if opt.LogLevelToInt() <= 0 {
+		log.Printf("Starting DDOS...")
+	}
 
 	for {
 		go func() {
 			err := ddos(opt)
 			if err != nil {
-				log.Printf("%v\n", err)
+				if opt.LogLevelToInt() <= 1 {
+					log.Printf("%v\n", err)
+				}
 
 				if opt.MaxRetryCount <= 0 {
 					return
 				}
 
 				if currentRetryCount += 1; currentRetryCount > opt.MaxRetryCount {
-					log.Printf("Reached max retry count (%v), exiting...\n", opt.MaxRetryCount)
+					if opt.LogLevelToInt() <= 2 {
+						log.Printf("Reached max retry count (%v), exiting...\n", opt.MaxRetryCount)
+					}
 					if !opt.IgnoreError {
 						os.Exit(1)
 					}
 				}
 			} else {
-				log.Printf("Successfully send packet to %v...\n", opt.Address)
+				if opt.LogLevelToInt() <= 0 {
+					log.Printf("Successfully send packet to %v...\n", opt.Address)
+				}
 			}
 		}()
 
