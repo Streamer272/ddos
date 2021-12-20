@@ -8,6 +8,11 @@ import (
 	"time"
 )
 
+const (
+	HttpMessage   = "GET / HTTP/1.0\n"
+	SocketMessage = "abcdefghijklmnopqrstuvwxyz1234567890"
+)
+
 func checkServer(opt options.Options) {
 	conn, err := net.Dial("tcp", opt.Address)
 	if err != nil {
@@ -15,9 +20,9 @@ func checkServer(opt options.Options) {
 	}
 	message := ""
 	if opt.Http {
-		message = "GET / HTTP/1.0\n"
+		message = HttpMessage
 	} else {
-		message = "abcdefghijklmnopqrstuvwxyz1234567890"
+		message = SocketMessage
 	}
 	_, err = fmt.Fprint(conn, message)
 	if err != nil {
@@ -37,9 +42,9 @@ func ddos(opt options.Options) {
 	}
 	message := ""
 	if opt.Http {
-		message = "GET / HTTP/1.0\n"
+		message = HttpMessage
 	} else {
-		message = "abcdefghijklmnopqrstuvwxyz1234567890"
+		message = SocketMessage
 	}
 	fmt.Fprint(conn, message)
 	conn.Close()
