@@ -45,10 +45,6 @@ func Parse() Options {
 		fmt.Printf("%v", parser.Usage("Cannot use `[-H|--http]` while using `[-m|--message]`"))
 		os.Exit(1)
 	}
-	if *ignoreError && *maxRetryCount != 0 {
-		fmt.Printf("%v", parser.Usage("Cannot use `[-i|--ignore-error]` while using `[-r|--max-retry-count]`"))
-		os.Exit(1)
-	}
 
 	return Options{
 		Delay:         *delay,
