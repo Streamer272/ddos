@@ -48,7 +48,7 @@ func main() {
 	opt := options.Parse()
 	log := logger.NewLogger(opt)
 	currentRetryCount := 0
-	currentWorkerCount := 0
+	currentRequestCount := 0
 
 	// errors
 	err := ddos(opt)
@@ -104,10 +104,10 @@ func main() {
 				}
 			}()
 
-			if opt.WorkerCount > 0 {
-				currentWorkerCount++
-				if currentWorkerCount >= opt.WorkerCount {
-					exitMessage <- fmt.Sprintf("Worker count reached (%v), exiting...", opt.WorkerCount)
+			if opt.RequestCount > 0 {
+				currentRequestCount++
+				if currentRequestCount >= opt.RequestCount {
+					exitMessage <- fmt.Sprintf("Request count reached (%v), exiting...", opt.RequestCount)
 				}
 			}
 

@@ -3,7 +3,7 @@ package options
 type Options struct {
 	Delay         int
 	MaxRetryCount int
-	WorkerCount   int
+	RequestCount  int
 	Address       string
 	Message       string
 	OutputFile    string

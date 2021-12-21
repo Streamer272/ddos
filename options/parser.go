@@ -14,9 +14,9 @@ func Parse() Options {
 	parser := argparse.NewParser("ddos", "Runs DDOS attack on desired server")
 	parser.ExitOnHelp(true)
 
-	delay := parser.Int("d", "delay", &argparse.Options{Required: false, Help: "Packet delay, 0 for none", Default: 10})
+	delay := parser.Int("d", "delay", &argparse.Options{Required: false, Help: "Packet delay", Default: 10})
 	maxRetryCount := parser.Int("r", "max-retry-count", &argparse.Options{Required: false, Help: "Max retry count, 0 for none", Default: 0})
-	workerCount := parser.Int("w", "worker-count", &argparse.Options{Required: false, Help: "Worker thread count, 0 for none", Default: 0}) // TODO: change to req count
+	requestCount := parser.Int("R", "request-count", &argparse.Options{Required: false, Help: "Request count, 0 for unlimited", Default: 0})
 	address := parser.String("a", "address", &argparse.Options{Required: false, Help: "Address to DDOS", Default: ""})
 	message := parser.String("m", "message", &argparse.Options{Required: false, Help: "Custom message to send", Default: ""})
 	outputFile := parser.String("o", "output", &argparse.Options{Required: false, Help: "Additional output file", Default: ""})
@@ -53,7 +53,7 @@ func Parse() Options {
 	return Options{
 		Delay:         *delay,
 		MaxRetryCount: *maxRetryCount,
-		WorkerCount:   *workerCount,
+		RequestCount:  *requestCount,
 		Address:       *address,
 		Message:       *message,
 		LogLevel:      *logLevel,
