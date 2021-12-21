@@ -13,12 +13,16 @@ type Logger struct {
 }
 
 func (l Logger) Log(logLevel string, message string, writeToFile bool) {
-	if logLevelToInt(logLevel) < logLevelToInt(l.opt.LogLevel) || logLevelToInt(logLevel) == 3 {
+	if logLevelToInt(logLevel) < logLevelToInt(l.opt.LogLevel) || logLevelToInt(logLevel) == 3 /* none */ {
 		return
 	}
 
 	currentTime := time.Now()
-	fmt.Printf("[%v] %v: %v\n", getColorFuncByLogLevel(logLevelToInt(logLevel))(logLevel), currentTime.Format("15:04:05"), message)
+	var output = os.Stdout
+	if logLevelToInt(logLevel) == 2 /* error */ {
+		output = os.Stderr
+	}
+	fmt.Fprintf(output, "[%v] %v: %v\n", getColorFuncByLogLevel(logLevelToInt(logLevel))(logLevel), currentTime.Format("15:04:05"), message)
 
 	if l.opt.OutputFile != "" && writeToFile {
 		file, err := os.OpenFile(l.opt.OutputFile, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
