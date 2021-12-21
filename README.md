@@ -1,4 +1,7 @@
 # DDOS
+[![License](https://img.shields.io/github/license/Streamer272/ddos)](https://github.com/Streamer272/ddos/blob/master/LICENSE)
+[![Stars](https://img.shields.io/github/stars/Streamer272/ddos)](https://img.shields.io/github/stars/Streamer272/ddos)
+
 Simple DDOS application to bring down your nemesis' website
 
 ## Usage
