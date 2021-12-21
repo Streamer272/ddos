@@ -17,7 +17,7 @@ func Test_ddos(t *testing.T) {
 				Delay:         0,
 				MaxRetryCount: 1,
 				RequestCount:  1,
-				Address:       "localhost:22",
+				Address:       "localhost:-1",
 				Message:       "",
 				OutputFile:    "",
 				LogLevel:      "INFO",
