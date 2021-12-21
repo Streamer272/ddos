@@ -9,11 +9,12 @@ import (
 )
 
 type Logger struct {
-	opt options.Options
+	opt      options.Options
+	disabled bool
 }
 
-func (l Logger) Log(logLevel string, message string, writeToFile bool) {
-	if logLevelToInt(logLevel) < logLevelToInt(l.opt.LogLevel) || logLevelToInt(logLevel) == 3 /* none */ {
+func (log *Logger) Log(logLevel string, message string, writeToFile bool) {
+	if logLevelToInt(logLevel) < logLevelToInt(log.opt.LogLevel) || logLevelToInt(logLevel) == 3 /* none */ || log.disabled {
 		return
 	}
 
@@ -22,27 +23,36 @@ func (l Logger) Log(logLevel string, message string, writeToFile bool) {
 	if logLevelToInt(logLevel) == 2 /* error */ {
 		output = os.Stderr
 	}
-	if writeToFile && l.opt.OutputFile != "" {
-		file, err := os.OpenFile(l.opt.OutputFile, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	if writeToFile && log.opt.OutputFile != "" {
+		file, err := os.OpenFile(log.opt.OutputFile, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 		if err != nil {
-			l.Log("ERROR", fmt.Sprintf("Couldn't write to %v...", l.opt.OutputFile), false)
+			log.Log("ERROR", fmt.Sprintf("Couldn't write to %v...", log.opt.OutputFile), false)
 		}
 		output = file
-		l.Log(logLevel, message, false)
+		log.Log(logLevel, message, false)
 		color.NoColor = true
 	}
 	fmt.Fprintf(output, "[%v] %v: %v\n", getColorFuncByLogLevel(logLevelToInt(logLevel))(logLevel), currentTime.Format("15:04:05"), message)
 
-	if writeToFile && l.opt.OutputFile != "" {
-		color.NoColor = l.opt.NoColor
+	if writeToFile && log.opt.OutputFile != "" {
+		color.NoColor = log.opt.NoColor
 	}
+}
+
+func (log *Logger) Disable() {
+	log.disabled = true
+}
+
+func (log *Logger) Enable() {
+	log.disabled = false
 }
 
 func NewLogger(opt options.Options) Logger {
 	color.NoColor = opt.NoColor
 
 	return Logger{
-		opt: opt,
+		opt:      opt,
+		disabled: false,
 	}
 }
 

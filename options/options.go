@@ -9,7 +9,7 @@ type Options struct {
 	OutputFile    string
 	LogLevel      string
 	Http          bool
+	ForceHttps    bool
 	IgnoreError   bool
 	NoColor       bool
-	// TODO: add force-https (use net.Get(url)) to support https
 }

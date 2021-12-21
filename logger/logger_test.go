@@ -13,7 +13,7 @@ func TestLogger_Log(t *testing.T) {
 	t.Run("Test logger output", func(t *testing.T) {
 		os.Remove("test.log")
 
-		l := NewLogger(options.Options{
+		log := NewLogger(options.Options{
 			Delay:         0,
 			MaxRetryCount: 0,
 			RequestCount:  0,
@@ -28,8 +28,8 @@ func TestLogger_Log(t *testing.T) {
 
 		currentTime := time.Now().Format("15:04:05")
 
-		l.Log("INFO", "This is test message 1", true)
-		l.Log("INFO", "This is test message 2", true)
+		log.Log("INFO", "This is test message 1", true)
+		log.Log("INFO", "This is test message 2", true)
 
 		expected := fmt.Sprintf("[INFO] %v: This is test message 1\n[INFO] %v: This is test message 2\n", currentTime, currentTime)
 

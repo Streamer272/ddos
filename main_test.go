@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/Streamer272/ddos/logger"
 	"github.com/Streamer272/ddos/options"
 	"testing"
 )
@@ -22,6 +23,7 @@ func Test_ddos(t *testing.T) {
 				OutputFile:    "",
 				LogLevel:      "INFO",
 				Http:          false,
+				ForceHttps:    false,
 				IgnoreError:   false,
 				NoColor:       true,
 			},
@@ -38,6 +40,7 @@ func Test_ddos(t *testing.T) {
 				OutputFile:    "",
 				LogLevel:      "INFO",
 				Http:          false,
+				ForceHttps:    false,
 				IgnoreError:   false,
 				NoColor:       true,
 			},
@@ -54,6 +57,24 @@ func Test_ddos(t *testing.T) {
 				OutputFile:    "",
 				LogLevel:      "INFO",
 				Http:          true,
+				ForceHttps:    false,
+				IgnoreError:   false,
+				NoColor:       true,
+			},
+			wantErr: false,
+		},
+		{
+			name: "Test regex",
+			opt: options.Options{
+				Delay:         0,
+				MaxRetryCount: 1,
+				RequestCount:  1,
+				Address:       "www.google.com",
+				Message:       "",
+				OutputFile:    "",
+				LogLevel:      "INFO",
+				Http:          false,
+				ForceHttps:    true,
 				IgnoreError:   false,
 				NoColor:       true,
 			},
@@ -63,6 +84,9 @@ func Test_ddos(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			log := logger.NewLogger(test.opt)
+			log.Disable()
+			test.opt.Address = fixAddress(test.opt, log)
 			if err := ddos(test.opt); (err != nil) != test.wantErr {
 				t.Errorf("ddos(%v) error = %v, wantErr = %v", test.opt, err, test.wantErr)
 			}
