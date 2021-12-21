@@ -86,7 +86,7 @@ func Test_ddos(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			log := logger.NewLogger(test.opt)
 			log.Disable()
-			test.opt.Address = fixAddress(test.opt, log)
+			fixAddress(&test.opt, log)
 			if err := ddos(test.opt); (err != nil) != test.wantErr {
 				t.Errorf("ddos(%v) error = %v, wantErr = %v", test.opt, err, test.wantErr)
 			}

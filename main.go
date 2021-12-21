@@ -52,7 +52,7 @@ func ddos(opt options.Options) error {
 	return nil
 }
 
-func fixAddress(opt options.Options, log logger.Logger) string {
+func fixAddress(opt *options.Options, log logger.Logger) {
 	protocolMatch, err := regexp.MatchString("https?://.*", opt.Address)
 	if err != nil {
 		log.Log("ERROR", fmt.Sprintf("Couldn't match regex, %v...", err), true)
@@ -65,8 +65,6 @@ func fixAddress(opt options.Options, log logger.Logger) string {
 		log.Log("WARN", fmt.Sprintf("%v does not contain port, using 80...", opt.Address), true)
 		opt.Address = opt.Address + ":80"
 	}
-
-	return opt.Address
 }
 
 func main() {
@@ -84,7 +82,7 @@ func main() {
 		log.Log("WARN", fmt.Sprintf("Recommended extension for output file is .log, has .%v...", outputFileSplit[len(outputFileSplit)-1]), true)
 	}
 
-	opt.Address = fixAddress(opt, log)
+	fixAddress(&opt, log)
 
 	// errors
 	err := ddos(opt)
