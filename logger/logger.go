@@ -4,27 +4,41 @@ import (
 	"ddos/options"
 	"fmt"
 	"github.com/fatih/color"
+	"os"
 	"time"
 )
 
 type Logger struct {
-	DesiredLogLevel string
+	opt options.Options
 }
 
-func (l Logger) Log(logLevel string, message string) {
-	if logLevelToInt(logLevel) < logLevelToInt(l.DesiredLogLevel) || logLevelToInt(logLevel) == 3 {
+func (l Logger) Log(logLevel string, message string, writeToFile bool) {
+	if logLevelToInt(logLevel) < logLevelToInt(l.opt.LogLevel) || logLevelToInt(logLevel) == 3 {
 		return
 	}
 
 	currentTime := time.Now()
-	fmt.Printf("[%v] %v: %v\n", getColorByLogLevel(logLevelToInt(logLevel))(logLevel), currentTime.Format("15:04:05"), message)
+	fmt.Printf("[%v] %v: %v\n", getColorFuncByLogLevel(logLevelToInt(logLevel))(logLevel), currentTime.Format("15:04:05"), message)
+
+	if l.opt.OutputFile != "" && writeToFile {
+		file, err := os.OpenFile(l.opt.OutputFile, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+		if err != nil {
+			l.Log("ERROR", fmt.Sprintf("Couldn't open file, %v...", err), false)
+		}
+		if _, err = file.WriteString(fmt.Sprintf("[%v] %v: %v\n", logLevel, currentTime.Format("15:04:05"), message)); err != nil {
+			l.Log("ERROR", fmt.Sprintf("Couldn't write to file, %v...", err), false)
+		}
+		if err = file.Close(); err != nil {
+			l.Log("ERROR", fmt.Sprintf("Couldn't close file, %v...", err), false)
+		}
+	}
 }
 
 func NewLogger(opt options.Options) Logger {
 	color.NoColor = opt.NoColor
 
 	return Logger{
-		DesiredLogLevel: opt.LogLevel,
+		opt: opt,
 	}
 }
 
@@ -41,7 +55,7 @@ func logLevelToInt(logLevel string) int {
 	}
 }
 
-func getColorByLogLevel(logLevel int) func(a ...interface{}) string {
+func getColorFuncByLogLevel(logLevel int) func(a ...interface{}) string {
 	switch logLevel {
 	case 0:
 		return color.New(color.FgGreen).SprintFunc()

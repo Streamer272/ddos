@@ -12,7 +12,7 @@ const (
 
 func Parse() Options {
 	parser := argparse.NewParser("ddos", "Runs DDOS attack on desired server")
-	parser.ExitOnHelp(true)
+	parser.ExitOnHelp(false)
 
 	delay := parser.Int("d", "delay", &argparse.Options{Required: false, Help: "Packet delay", Default: 0})
 	maxRetryCount := parser.Int("r", "max-retry-count", &argparse.Options{Required: false, Help: "Max retry count, 0 for none", Default: 0})
@@ -20,6 +20,7 @@ func Parse() Options {
 	address := parser.String("a", "address", &argparse.Options{Required: false, Help: "Address to DDOS", Default: ""})
 	message := parser.String("m", "message", &argparse.Options{Required: false, Help: "Custom message to send", Default: ""})
 	logLevel := parser.Selector("l", "log-level", []string{"NONE", "ERROR", "WARN", "INFO"}, &argparse.Options{Required: false, Help: "Log level", Default: "INFO"})
+	outputFile := parser.String("o", "output", &argparse.Options{Required: false, Help: "Additional output file", Default: ""})
 	http := parser.Flag("H", "http", &argparse.Options{Required: false, Help: "Use HTTP message", Default: false})
 	ignoreError := parser.Flag("i", "ignore-error", &argparse.Options{Required: false, Help: "Do not terminate program on error", Default: false})
 	noColor := parser.Flag("N", "no-color", &argparse.Options{Required: false, Help: "Display colored output", Default: false})
@@ -28,6 +29,7 @@ func Parse() Options {
 	err := parser.Parse(os.Args)
 	if err != nil {
 		fmt.Print(parser.Usage(err))
+		os.Exit(0)
 	}
 
 	if *version {
@@ -58,5 +60,6 @@ func Parse() Options {
 		IgnoreError:   *ignoreError,
 		Http:          *http,
 		NoColor:       *noColor,
+		OutputFile:    *outputFile,
 	}
 }

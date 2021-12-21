@@ -4,6 +4,7 @@ import (
 	"ddos/logger"
 	"ddos/options"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"os"
 	"os/signal"
@@ -50,17 +51,24 @@ func main() {
 
 	err := ddos(opt)
 	if err != nil {
-		log.Log("ERROR", fmt.Sprintf("Couldn't run test-connect, error: %v...", err))
+		log.Log("ERROR", fmt.Sprintf("Couldn't run test-connect, error: %v...", err), true)
 
 		if !opt.IgnoreError {
 			os.Exit(1)
 		}
 	}
 
-	log.Log("INFO", "Starting DDOS...")
+	log.Log("INFO", "Starting DDOS...", true)
 
 	if opt.Delay <= 0 {
-		log.Log("WARN", "Undefined delay may cause system to lag...")
+		log.Log("WARN", "Undefined delay may cause system to lag...", true)
+	}
+	if opt.OutputFile != "" {
+		err := ioutil.WriteFile(opt.OutputFile, []byte(""), 0777)
+		if err != nil {
+			log.Log("ERROR", fmt.Sprintf("Couldn't rewrite file, %v...", err), false)
+			os.Exit(1)
+		}
 	}
 
 	exitMessage := make(chan string)
@@ -70,7 +78,7 @@ func main() {
 			go func() {
 				err := ddos(opt)
 				if err != nil {
-					log.Log("WARN", fmt.Sprintf("%v", err))
+					log.Log("WARN", fmt.Sprintf("%v", err), true)
 
 					if opt.MaxRetryCount <= 0 {
 						return
@@ -80,7 +88,7 @@ func main() {
 						exitMessage <- fmt.Sprintf("Reached max retry count (%v), exiting...", opt.MaxRetryCount)
 					}
 				} else {
-					log.Log("INFO", fmt.Sprintf("Successfully send packet to %v...", opt.Address))
+					log.Log("INFO", fmt.Sprintf("Successfully send packet to %v...", opt.Address), true)
 				}
 			}()
 
@@ -102,5 +110,6 @@ func main() {
 		exitMessage <- "Interrupted by user, exiting..."
 	}()
 
-	log.Log("INFO", <-exitMessage)
+	exitMessageString := <-exitMessage
+	log.Log("INFO", exitMessageString, true)
 }

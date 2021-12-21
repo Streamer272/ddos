@@ -7,6 +7,7 @@ type Options struct {
 	Address       string
 	Message       string
 	LogLevel      string
+	OutputFile    string
 	Http          bool
 	IgnoreError   bool
 	NoColor       bool
