@@ -12,7 +12,7 @@ const (
 
 func Parse() Options {
 	parser := argparse.NewParser("ddos", "Runs DDOS attack on desired server")
-	parser.ExitOnHelp(false)
+	parser.ExitOnHelp(true)
 
 	delay := parser.Int("d", "delay", &argparse.Options{Required: false, Help: "Packet delay, 0 for none", Default: 10})
 	maxRetryCount := parser.Int("r", "max-retry-count", &argparse.Options{Required: false, Help: "Max retry count, 0 for none", Default: 0})
