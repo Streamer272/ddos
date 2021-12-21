@@ -30,8 +30,8 @@ ddos --address www.mynemisis.com:443 --output mynemesis-ddos.log --message "HELL
 ## Installation
 - Clone repository using git - `git clone https://github.com/Streamer272/ddos.git`
 - Move into repository folder - `cd ddos`
-- Build Go - `go build main.go`
-- Add to `/usr/bin` [Optional] - `cp ./main /usr/bin/ddos`
+- Build Go - `go build`
+- Add to `/usr/bin` [Optional] - `cp ./ddos /usr/bin/ddos`
 
 ## License
 This project is licensed under [MIT](https://github.com/Streamer272/ddos/blob/master/LICENSE `License`) license.
