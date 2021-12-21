@@ -10,6 +10,7 @@ type Logger struct {
 	DesiredLogLevel string
 }
 
+// TODO: fixme so i don't take formats
 func (l Logger) Log(logLevel string, message string, formats ...interface{}) {
 	if logLevelToInt(logLevel) < logLevelToInt(l.DesiredLogLevel) || logLevelToInt(logLevel) == 3 {
 		return

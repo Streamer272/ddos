@@ -63,6 +63,8 @@ func main() {
 		log.Log("WARN", "Undefined delay may cause system to lag...")
 	}
 
+	exitMessage := make(chan string)
+
 	go func() {
 		for {
 			go func() {
@@ -75,11 +77,7 @@ func main() {
 					}
 
 					if currentRetryCount += 1; currentRetryCount > opt.MaxRetryCount {
-						log.Log("INFO", "Reached max retry count (%v), exiting...", opt.MaxRetryCount)
-
-						if !opt.IgnoreError {
-							os.Exit(1)
-						}
+						exitMessage <- fmt.Sprintf("Reached max retry count (%v), exiting...", opt.MaxRetryCount)
 					}
 				} else {
 					log.Log("INFO", "Successfully send packet to %v...", opt.Address)
@@ -89,8 +87,7 @@ func main() {
 			if opt.WorkerCount > 0 {
 				currentWorkerCount++
 				if currentWorkerCount >= opt.WorkerCount {
-					log.Log("INFO", "Worker count reached (%v), exiting...", opt.WorkerCount)
-					os.Exit(0)
+					exitMessage <- fmt.Sprintf("Worker count reached (%v), exiting...", opt.WorkerCount)
 				}
 			}
 
@@ -98,10 +95,12 @@ func main() {
 		}
 	}()
 
-	interrupt := make(chan os.Signal)
-	signal.Notify(interrupt, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM)
-	<-interrupt
+	go func() {
+		interruptSignal := make(chan os.Signal)
+		signal.Notify(interruptSignal, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM)
+		<-interruptSignal
+		exitMessage <- "Interrupted by user, exiting..."
+	}()
 
-	fmt.Printf("\r")
-	log.Log("INFO", "Interrupted by user, exiting...")
+	log.Log("INFO", <-exitMessage)
 }
