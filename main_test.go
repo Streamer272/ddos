@@ -2,19 +2,10 @@ package main
 
 import (
 	"ddos/options"
-	"net/http"
 	"testing"
 )
 
 func Test_ddos(t *testing.T) {
-	go func() {
-		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("Hey man"))
-		})
-
-		http.ListenAndServe(":8080", nil)
-	}()
-
 	tests := []struct {
 		name    string
 		opt     options.Options
@@ -58,7 +49,7 @@ func Test_ddos(t *testing.T) {
 				Delay:         0,
 				MaxRetryCount: 1,
 				RequestCount:  1,
-				Address:       "localhost:8080",
+				Address:       "www.google.com:443",
 				Message:       "",
 				OutputFile:    "",
 				LogLevel:      "INFO",
