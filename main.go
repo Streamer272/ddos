@@ -8,6 +8,7 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -49,6 +50,7 @@ func main() {
 	currentRetryCount := 0
 	currentWorkerCount := 0
 
+	// errors
 	err := ddos(opt)
 	if err != nil {
 		log.Log("ERROR", fmt.Sprintf("Couldn't run test-connect, error: %v...", err), true)
@@ -57,19 +59,29 @@ func main() {
 			os.Exit(1)
 		}
 	}
-
-	log.Log("INFO", "Starting DDOS...", true)
-
-	if opt.Delay <= 0 {
-		log.Log("WARN", "Undefined delay may cause system to lag...", true)
-	}
 	if opt.OutputFile != "" {
 		err := ioutil.WriteFile(opt.OutputFile, []byte(""), 0777)
 		if err != nil {
 			log.Log("ERROR", fmt.Sprintf("Couldn't rewrite file, %v...", err), false)
-			os.Exit(1)
+
+			if !opt.IgnoreError {
+				os.Exit(1)
+			}
 		}
 	}
+
+	// warnings
+	if opt.Delay <= 0 {
+		log.Log("WARN", "Undefined delay may cause system to lag...", true)
+	}
+	if opt.OutputFile != "" && !strings.HasSuffix(opt.OutputFile, ".log") {
+		outputFileSplit := strings.Split(opt.OutputFile, ".")
+		log.Log("WARN", fmt.Sprintf("Recommended extension for output file is .log, has .%v...", outputFileSplit[len(outputFileSplit)-1]), true)
+	}
+
+	time.Sleep(time.Second)
+
+	log.Log("INFO", "Starting DDOS...", true)
 
 	exitMessage := make(chan string)
 
