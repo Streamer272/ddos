@@ -18,7 +18,7 @@ func (l Logger) Log(logLevel string, message string, writeToFile bool) {
 	}
 
 	currentTime := time.Now()
-	var output = os.Stdout
+	output := os.Stdout
 	if logLevelToInt(logLevel) == 2 /* error */ {
 		output = os.Stderr
 	}
