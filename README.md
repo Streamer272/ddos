@@ -34,4 +34,4 @@ ddos --address www.mynemisis.com:443 --output mynemesis-ddos.log --message "HELL
 - Add to `/usr/bin` [Optional] - `cp ./ddos /usr/bin/ddos`
 
 ## License
-This project is licensed under [MIT](https://github.com/Streamer272/ddos/blob/master/LICENSE `License`) license.
+This project is licensed under [MIT](https://github.com/Streamer272/ddos/blob/master/LICENSE) license.
