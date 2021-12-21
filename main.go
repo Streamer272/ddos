@@ -59,6 +59,10 @@ func main() {
 
 	log.Log("INFO", "Starting DDOS...")
 
+	if opt.Delay <= 0 {
+		log.Log("WARN", "Undefined delay may cause system to lag...")
+	}
+
 	go func() {
 		for {
 			go func() {
