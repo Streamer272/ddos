@@ -49,7 +49,7 @@ func Test_ddos(t *testing.T) {
 				Delay:         0,
 				MaxRetryCount: 1,
 				RequestCount:  1,
-				Address:       "https://www.google.com",
+				Address:       "www.google.com:443",
 				Message:       "",
 				OutputFile:    "",
 				LogLevel:      "INFO",
