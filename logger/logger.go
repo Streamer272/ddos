@@ -22,19 +22,15 @@ func (l Logger) Log(logLevel string, message string, writeToFile bool) {
 	if logLevelToInt(logLevel) == 2 /* error */ {
 		output = os.Stderr
 	}
+	if writeToFile && l.opt.OutputFile != os.Stdout {
+		output = l.opt.OutputFile
+		l.Log(logLevel, message, false)
+		color.NoColor = true
+	}
 	fmt.Fprintf(output, "[%v] %v: %v\n", getColorFuncByLogLevel(logLevelToInt(logLevel))(logLevel), currentTime.Format("15:04:05"), message)
 
-	if l.opt.OutputFile != "" && writeToFile {
-		file, err := os.OpenFile(l.opt.OutputFile, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
-		if err != nil {
-			l.Log("ERROR", fmt.Sprintf("Couldn't open file, %v...", err), false)
-		}
-		if _, err = file.WriteString(fmt.Sprintf("[%v] %v: %v\n", logLevel, currentTime.Format("15:04:05"), message)); err != nil {
-			l.Log("ERROR", fmt.Sprintf("Couldn't write to file, %v...", err), false)
-		}
-		if err = file.Close(); err != nil {
-			l.Log("ERROR", fmt.Sprintf("Couldn't close file, %v...", err), false)
-		}
+	if writeToFile && l.opt.OutputFile != os.Stdout {
+		color.NoColor = l.opt.NoColor
 	}
 }
 

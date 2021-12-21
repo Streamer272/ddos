@@ -20,11 +20,11 @@ func Parse() Options {
 	address := parser.String("a", "address", &argparse.Options{Required: false, Help: "Address to DDOS", Default: ""})
 	message := parser.String("m", "message", &argparse.Options{Required: false, Help: "Custom message to send", Default: ""})
 	logLevel := parser.Selector("l", "log-level", []string{"NONE", "ERROR", "WARN", "INFO"}, &argparse.Options{Required: false, Help: "Log level", Default: "INFO"})
-	outputFile := parser.String("o", "output", &argparse.Options{Required: false, Help: "Additional output file", Default: ""})
 	http := parser.Flag("H", "http", &argparse.Options{Required: false, Help: "Use HTTP message", Default: false})
 	ignoreError := parser.Flag("i", "ignore-error", &argparse.Options{Required: false, Help: "Do not terminate program on error", Default: false})
 	noColor := parser.Flag("N", "no-color", &argparse.Options{Required: false, Help: "Display colored output", Default: false})
 	version := parser.Flag("v", "version", &argparse.Options{Required: false, Help: "Display version info", Default: false})
+	outputFile := parser.File("o", "output", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600, &argparse.Options{Required: false, Help: "Additional output file", Default: os.Stdout})
 
 	err := parser.Parse(os.Args)
 	if err != nil {
@@ -60,6 +60,6 @@ func Parse() Options {
 		IgnoreError:   *ignoreError,
 		Http:          *http,
 		NoColor:       *noColor,
-		OutputFile:    *outputFile,
+		OutputFile:    outputFile,
 	}
 }
