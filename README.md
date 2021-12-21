@@ -33,5 +33,10 @@ ddos --address www.mynemisis.com:443 --output mynemesis-ddos.log --message "HELL
 - Build Go - `go build`
 - Add to `/usr/bin` [Optional] - `cp ./ddos /usr/bin/ddos`
 
+## Run in docker
+```bash
+docker run -it --rm -v $(pwd):/home/logs streamer272/ddos --address www.mynemesis.com:443 --output /home/logs/ddos.log --message "HELLO SUCKET" --max-retry-count 100
+```
+
 ## License
 This project is licensed under [MIT](https://github.com/Streamer272/ddos/blob/master/LICENSE) license.
