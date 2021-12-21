@@ -11,4 +11,5 @@ type Options struct {
 	Http          bool
 	IgnoreError   bool
 	NoColor       bool
+	// TODO: add force-https (use net.Get(url)) to support https
 }
