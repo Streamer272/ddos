@@ -59,8 +59,8 @@ func main() {
 			os.Exit(1)
 		}
 	}
-	if opt.OutputFile != os.Stdout {
-		err := ioutil.WriteFile(opt.OutputFile.Name(), []byte(""), 0600)
+	if opt.OutputFile != "" {
+		err := ioutil.WriteFile(opt.OutputFile, []byte(""), 0777)
 		if err != nil {
 			log.Log("ERROR", fmt.Sprintf("Couldn't rewrite file, %v...", err), false)
 
@@ -74,8 +74,8 @@ func main() {
 	if opt.Delay <= 0 {
 		log.Log("WARN", "Undefined delay may cause system to lag...", true)
 	}
-	if opt.OutputFile != os.Stdout && !strings.HasSuffix(opt.OutputFile.Name(), ".log") {
-		outputFileSplit := strings.Split(opt.OutputFile.Name(), ".")
+	if opt.OutputFile != "" && !strings.HasSuffix(opt.OutputFile, ".log") {
+		outputFileSplit := strings.Split(opt.OutputFile, ".")
 		log.Log("WARN", fmt.Sprintf("Recommended extension for output file is .log, has .%v...", outputFileSplit[len(outputFileSplit)-1]), true)
 	}
 
