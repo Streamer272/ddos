@@ -1,8 +1,13 @@
+# IDE
 /.idea
 /.vscode
 /.vs
 /.atom
 
+# build
 build
 a.out
 ddos
+
+# logs
+*.log
