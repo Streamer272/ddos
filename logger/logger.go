@@ -1,8 +1,8 @@
 package logger
 
 import (
-	"ddos/options"
 	"fmt"
+	"github.com/Streamer272/ddos/options"
 	"github.com/fatih/color"
 	"os"
 	"time"

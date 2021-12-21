@@ -1,9 +1,9 @@
 package main
 
 import (
-	"ddos/logger"
-	"ddos/options"
 	"fmt"
+	"github.com/Streamer272/ddos/logger"
+	"github.com/Streamer272/ddos/options"
 	"io/ioutil"
 	"net"
 	"os"

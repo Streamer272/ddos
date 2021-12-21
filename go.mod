@@ -1,4 +1,4 @@
-module ddos
+module github.com/Streamer272/ddos
 
 go 1.17
 

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"ddos/options"
+	"github.com/Streamer272/ddos/options"
 	"testing"
 )
 
