@@ -44,13 +44,13 @@ func ddos(opt options.Options) error {
 
 func main() {
 	opt := options.Parse()
-	log := logger.NewLogger(opt.LogLevel, opt.NoColor)
+	log := logger.NewLogger(opt)
 	currentRetryCount := 0
 	currentWorkerCount := 0
 
 	err := ddos(opt)
 	if err != nil {
-		log.Log("ERROR", "Couldn't run test-connect, error: %v...", err)
+		log.Log("ERROR", fmt.Sprintf("Couldn't run test-connect, error: %v...", err))
 
 		if !opt.IgnoreError {
 			os.Exit(1)
@@ -70,7 +70,7 @@ func main() {
 			go func() {
 				err := ddos(opt)
 				if err != nil {
-					log.Log("WARN", "%v", err)
+					log.Log("WARN", fmt.Sprintf("%v", err))
 
 					if opt.MaxRetryCount <= 0 {
 						return
@@ -80,7 +80,7 @@ func main() {
 						exitMessage <- fmt.Sprintf("Reached max retry count (%v), exiting...", opt.MaxRetryCount)
 					}
 				} else {
-					log.Log("INFO", "Successfully send packet to %v...", opt.Address)
+					log.Log("INFO", fmt.Sprintf("Successfully send packet to %v...", opt.Address))
 				}
 			}()
 

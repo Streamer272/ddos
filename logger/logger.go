@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"ddos/options"
 	"fmt"
 	"github.com/fatih/color"
 	"time"
@@ -10,21 +11,20 @@ type Logger struct {
 	DesiredLogLevel string
 }
 
-// TODO: fixme so i don't take formats
-func (l Logger) Log(logLevel string, message string, formats ...interface{}) {
+func (l Logger) Log(logLevel string, message string) {
 	if logLevelToInt(logLevel) < logLevelToInt(l.DesiredLogLevel) || logLevelToInt(logLevel) == 3 {
 		return
 	}
 
 	currentTime := time.Now()
-	fmt.Printf("[%v] %v: %v\n", getColorByLogLevel(logLevelToInt(logLevel))(logLevel), currentTime.Format("15:04:05"), fmt.Sprintf(message, formats...))
+	fmt.Printf("[%v] %v: %v\n", getColorByLogLevel(logLevelToInt(logLevel))(logLevel), currentTime.Format("15:04:05"), message)
 }
 
-func NewLogger(desiredLogLevel string, noColor bool) Logger {
-	color.NoColor = noColor
+func NewLogger(opt options.Options) Logger {
+	color.NoColor = opt.NoColor
 
 	return Logger{
-		DesiredLogLevel: desiredLogLevel,
+		DesiredLogLevel: opt.LogLevel,
 	}
 }
 
